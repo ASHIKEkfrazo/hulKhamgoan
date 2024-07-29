@@ -10,6 +10,7 @@ import { Hourglass } from 'react-loader-spinner'
 
 
 const Organisation = () => {
+  
   const [modal2Open, setModal2Open] = useState(false);
   const [ImageFile, setImageFile] = useState(null);
   const [organization, setOrganization] = useState();
@@ -220,7 +221,7 @@ else{
           return (
             <>
             
-            <div   key={item.id} onClick={()=>{handleStorage(item);navigate('/dashboard-home')}}>
+            <div key={item.id} onClick={()=>{handleStorage(item);navigate('/dashboard-home')}}>
               <Card
                 size="small"
                 style={{

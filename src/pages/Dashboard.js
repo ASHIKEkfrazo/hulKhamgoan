@@ -129,9 +129,9 @@ setSelectedDate(null)
     })
       .then(response => {
         setLoaderData(false)
-        const {active_products,...filterData} = response.data
+        const {areas,...filterData} = response.data
         setTableData(filterData);
-        setActiveProd(active_products)
+        setActiveProd(areas)
         setFilterActive(true)
       })
       .catch(error => {
@@ -163,7 +163,7 @@ setSelectedDate(null)
     initialDateRange();
     initialTableData();
     initialProductionData()
-    prodApi()
+    alertApi()
     getSystemStatus()
   }, []);
 
@@ -237,9 +237,10 @@ setSelectedDate(null)
     })
       .then(response => {
         setLoaderData(false)
-        const { active_products, ...datesData } = response.data;
+        const { areas, ...datesData } = response.data;
         setTableData(datesData);
-        setActiveProd(active_products);
+        setActiveProd(areas);
+        setActiveProd(areas);
       })
       .catch(error => {
         console.error('Error:', error);
@@ -270,9 +271,9 @@ setSelectedDate(null)
   };
 const [alertData,setAlertData]=useState(null);
 
-  const prodApi = ()=>{
+  const alertApi = ()=>{
     const domain = `${baseURL}`;
-    const url = `${domain}product/?plant_name=${localPlantData.plant_name}`;
+    const url = `${domain}area/?plant_name=${localPlantData.plant_name}`;
     axios.get(url,{
       headers:{
         Authorization:`Bearer ${AuthToken}`
@@ -367,7 +368,7 @@ const categorizeDefects = (data) => {
           {activeMachines.map(machine => (
             <div key={machine.id} style={{display:"flex",flexDirection:"column"}}>
            {   machine.system_status ? 
-              <p style={{fontSize:"1.1rem",width:"100%"}} value={machine.id}>{machine.machine_name}</p> : null}
+              <p style={{fontSize:"1.1rem",width:"100%"}} value={machine.id}>{machine.machine_name}</p> :  <p style={{fontSize:"1.1rem",width:"100%"}} >NO ACTIVE MACHINES</p>}
             </div>
           ))}
         </Checkbox.Group>
@@ -391,17 +392,20 @@ const categorizeDefects = (data) => {
       </Menu.Item>
     </Menu>
   )
-console.log(activeProd,"activeProd")
+
 const prodMenu = (
   <Menu>
   <Menu.Item key="0">
     <Checkbox.Group style={{display:"block"}} >
+
 {
+  activeProd ?  
 Object.values(activeProd).map(prod => (
 <div key={prod.id} style={{display:"flex",flexDirection:"column"}}>
 <p style={{fontSize:"1.1rem",width:"100%"}} value={prod}>{prod}</p>
 </div>
 ))
+: null
 }
    
 
@@ -555,7 +559,7 @@ console.log(menu,"<<<")
       <Select
         style={{ minWidth: "200px", marginRight: "10px" }}
         showSearch
-        placeholder="Select Products"
+        placeholder="Select Area"
         onChange={handleProductChange}
         value={selectedProduct}
         size="large"
@@ -632,7 +636,7 @@ console.log(menu,"<<<")
                   <Row align="middle">
                     <Col xs={18}>
                       <Title level={3} style={{fontSize:"1.5rem"}}>
-                        {`Defect Classification`}
+                        {`Downtime  (seconds)`}
                       </Title>
 
                       {/* <span>  {Object.keys(categoryDefects).reduce((total, category) => total + category, 0)}</span> */}
@@ -648,7 +652,7 @@ console.log(menu,"<<<")
               </Dropdown>
               </Card>
             </Col>
-            <Col
+            {/* <Col
               key={1}
               xs={24}
               sm={24}
@@ -677,7 +681,7 @@ console.log(menu,"<<<")
                 </div>
                 </Dropdown>
               </Card>
-            </Col>
+            </Col> */}
 
             <Col
               key={1}
@@ -688,23 +692,23 @@ console.log(menu,"<<<")
               className="mb-24"
               
             >
-              <Link to="/insights">
+              {/* <Link to="/insights">
               <Card
                bordered={false} className={`criclebox ${notifications.length > prevNotificationLength ? 'notification-change' : ''}`} style={{minHeight:"180px"}}>
           
-              {/* <Card bordered={false} className={`criclebox ${notifications.length > prevNotificationLength ? 'notification-change' : ''}`}> */}
+              <Card bordered={false} className={`criclebox ${notifications.length > prevNotificationLength ? 'notification-change' : ''}`}>
             <div className="number" >
               <Row align="middle">
                 <Col xs={18}>
                   <Title level={3} style={{fontSize:"1.5rem"}}>
-                    {`Insights`}
+                    {`Areas`}
                   </Title>
-                  {/* <button onClick={notify}>click</button> */}
-                  {/* {
+                  <button onClick={notify}>click</button>
+                  {
                     notifications ? 
                     <span>{notifications.length}</span>
                     : 0
-                  } */}
+                  }
                   <br />
                 </Col>
                 <Col xs={6}>
@@ -713,7 +717,7 @@ console.log(menu,"<<<")
               </Row>
             </div>
           </Card>
-          </Link>
+          </Link> */}
               
               {/* <Card bordered={false} className="criclebox ">
                 <div className="number">
@@ -745,7 +749,7 @@ console.log(menu,"<<<")
     <div className="timeline-box">
       <h5 style={{overflowWrap:'break-word'}}>{category}</h5>
       <Paragraph className="lastweek">
-        <span className="bnb2">{categoryDefects[category]}</span> Defects
+        <span className="bnb2">{categoryDefects[category]}</span> seconds
       </Paragraph>
     </div>
   </Card>
@@ -753,23 +757,23 @@ console.log(menu,"<<<")
 
 <Card bordered={true} className="criclebox h-full mb-2 px-2">
   <div className="timeline-box">
-    <h5>Total Defects</h5>
+    <h5>Total Time</h5>
     <Paragraph className="lastweek">
       <span className="bnb2">
         {Object.values(categoryDefects).reduce((total, category) => total + category, 0)}
-      </span> Defects
+      </span> Seconds
     </Paragraph>
   </div>
 </Card>
 
   </Card>
 </Col>
-<Col xs={24} sm={24} md={12} lg={14} xl={18} className="mb-24">
+{/* <Col xs={24} sm={24} md={12} lg={14} xl={18} className="mb-24">
             <Card bordered={false} className="criclebox h-full">
               <MachineParam   />
 
             </Card>
-            </Col>
+            </Col> */}
 
 {
   loaderData ? 
@@ -787,13 +791,13 @@ console.log(menu,"<<<")
   </div>
   :
 <>
-          <Col xs={24} sm={24} md={12} lg={12} xl={12} className="mb-24">
+          {/* <Col xs={24} sm={24} md={12} lg={12} xl={12} className="mb-24">
             <Card bordered={false} className="criclebox h-full">
-              {/* <LineChart data={tableData}/> */}
+              <LineChart data={tableData}/>
               <ProductionVsReject data={productionData}/>
             </Card>
-          </Col>
-           <Col xs={24} sm={24} md={12} lg={12} xl={12} className="mb-24">
+          </Col> */}
+           <Col xs={24} sm={24} md={24} lg={24} xl={12} className="mb-24">
             <Card bordered={false} className="criclebox h-full">
               <StackChart data={tableData}/>
 

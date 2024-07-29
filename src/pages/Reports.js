@@ -33,10 +33,10 @@ const Reports = () => {
 
 
   const columns = [
-    { title: "Product Name", dataIndex: "product", key: "alert_name",id:"alert_name"  ,
-      sorter: (a, b) => a.product.localeCompare(b.product),
-      sortDirections: ['ascend','descend' ,'cancel'], },
-    { title: "Defect Name", dataIndex: "defect", key: "defect_name" ,
+    // { title: "Product Name", dataIndex: "product", key: "alert_name",id:"alert_name"  ,
+    //   sorter: (a, b) => a.product.localeCompare(b.product),
+    //   sortDirections: ['ascend','descend' ,'cancel'], },
+    { title: "Area Name", dataIndex: "defect", key: "defect_name" ,
       sorter: (a, b) => a.defect.localeCompare(b.defect),
       sortDirections: ['ascend','descend' ,'cancel'],
 
@@ -47,7 +47,7 @@ const Reports = () => {
 
      },
     {
-      title: "Department Name",
+      title: "Downtime (seconds) ",
       dataIndex: "department",
       key: "department_name",
       sorter: (a, b) => a.department.localeCompare(b.department),
@@ -71,7 +71,8 @@ const Reports = () => {
       key: "image",
       render: (image_b64) =>
         image_b64 ? (
-          <Image src={`http://localhost:8000${image_b64}`} alt="Defect Image" width={50} />
+          // <Image src={`http://localhost:8000${image_b64}`} alt="NA" width={50} />
+          <p>NA</p>
           // <Image src={image_b64} alt="Defect Image" width={50} />
         ) : null,
     },
@@ -499,7 +500,7 @@ const resetFilter = ()=>{
       <Select
         style={{ minWidth: "200px", marginRight: "10px" }}
         showSearch
-        placeholder="Select Product"
+        placeholder="Select Area"
         onChange={handleProductChange}
         value={selectedProduct}
         size="large"
@@ -513,7 +514,7 @@ const resetFilter = ()=>{
           <Select.Option key={department.id} value={department.id}>{department.name}</Select.Option>
         ))}
       </Select>
-      <Select
+      {/* <Select
         style={{ minWidth: "200px", marginRight: "10px" }}
         showSearch
         placeholder="Select Defect"
@@ -529,7 +530,7 @@ const resetFilter = ()=>{
         {defectsOptions.map(department => (
           <Select.Option key={department.id} value={department.id}>{department.name}</Select.Option>
         ))}
-      </Select>
+      </Select> */}
 
       <RangePicker
       // showTime

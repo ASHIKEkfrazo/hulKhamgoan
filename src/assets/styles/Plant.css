@@ -20,6 +20,7 @@ margin: 0;
     flex-direction:column;
     gap:2rem;
     background:#fff;
+    min-width: 600px;
 }
 .mytab-content::-webkit-scrollbar {
     width: 4px;
