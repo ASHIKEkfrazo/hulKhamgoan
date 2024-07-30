@@ -20,12 +20,29 @@ import  {Hourglass} from "react-loader-spinner";
 
 function Dashboard() {
 
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+
   const startDate = new Date();
+  console.log(startDate,"<dates")
   startDate.setDate(startDate.getDate() - 7); 
   const formattedStartDate = startDate.toISOString().slice(0, 10);  
   const endDate = new Date(); 
   const formattedEndDate = endDate.toISOString().slice(0, 10); 
   const dateFormat = 'YYYY/MM/DD';
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const formattedDate = `${year}/${month}/${day}`;
+
 
   const [selectedMachine, setSelectedMachine] = useState(null);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -33,14 +50,17 @@ function Dashboard() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
 const [loaderData,setLoaderData] = useState(false)
-  const [dateRange, setDateRange] = useState([formattedStartDate, formattedEndDate]);
+  const [dateRange, setDateRange] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [productionData,setProductionData]=useState([])
+  const [datesData,setDatesData]=useState([])
+
   const [machineOptions, setMachineOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
   const [activeMachines,setActiveMachines] = useState([])
   const [activeProd,setActiveProd] = useState([])
+  const[currentDateData , setCurrentDateData] = useState();
 
   const handleMachineChange = value => {
     setSelectedMachine(value);
@@ -75,7 +95,6 @@ const [loaderData,setLoaderData] = useState(false)
 initialTableData()
 setFilterActive(false)
 initialProductionData()
-
 setSelectedMachine(null)
 setSelectedProduct(null)
 setSelectedDate(null)
@@ -84,7 +103,10 @@ setSelectedDate(null)
   const handleApplyFilters = () => {
     setLoaderData(true)
     const domain = `${baseURL}`;
-    const [fromDate, toDate] = dateRange;
+    let fromDate, toDate;
+    if (Array.isArray(dateRange) && dateRange.length === 2) {
+      [fromDate, toDate] = dateRange;
+    }
 
     let url = `${domain}dashboard/?`;
     // url += `plant_id=${localPlantData.id}&from_date=${fromDate}&to_date=${toDate}&machine_id=${selectedMachine}&department_id=${selectedDepartment}&product_id=${selectedProduct}&defect_id=${selectedDefect}`;
@@ -100,15 +122,15 @@ setSelectedDate(null)
   if (selectedMachine) {
       url += `machine_id=${selectedMachine}&`;
   }
-  if (selectedDepartment) {
-      url += `department_id=${selectedDepartment}&`;
-  }
+  // if (selectedDepartment) {
+  //     url += `department_id=${selectedDepartment}&`;
+  // }
   if (selectedProduct) {
-      url += `product_id=${selectedProduct}&`;
+      url += `area=${selectedProduct}&`;
   }
-  if (selectedDefect) {
-      url += `defect_id=${selectedDefect}&`;
-  }
+  // if (selectedDefect) {
+  //     url += `defect_id=${selectedDefect}&`;
+  // }
   
   // Remove the trailing '&' if present
   if (url.endsWith('&')) {
@@ -129,8 +151,21 @@ setSelectedDate(null)
     })
       .then(response => {
         setLoaderData(false)
-        const {areas,...filterData} = response.data
-        setTableData(filterData);
+        const { areas, ...datesData } = response.data;
+        setDatesData([datesData])
+
+        const extractedData = Object.entries(datesData).reduce((acc, [date, dateData]) => {
+          const filteredData = Object.entries(dateData)
+            .filter(([key]) => key !== 'total_duration')
+            .reduce((obj, [key, value]) => {
+              obj[key] = value;
+              return obj;
+            }, {});
+    
+          acc[date] = filteredData;
+          return acc;
+        }, {});
+        setTableData(extractedData);
         setActiveProd(areas)
         setFilterActive(true)
       })
@@ -160,7 +195,7 @@ setSelectedDate(null)
   useEffect(() => {
     getDepartments();
     getMachines();
-    initialDateRange();
+    // initialDateRange();
     initialTableData();
     initialProductionData()
     alertApi()
@@ -207,17 +242,17 @@ setSelectedDate(null)
         console.error('Error fetching department data:', error);
       });
   };
-  const initialDateRange = () => {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 7); // 7 days ago
-    const formattedStartDate = startDate.toISOString().slice(0, 10);
-     // Format startDate as YYYY-MM-DD
+  // const initialDateRange = () => {
+  //   const startDate = new Date();
+  //   startDate.setDate(startDate.getDate() - 7); // 7 days ago
+  //   const formattedStartDate = startDate.toISOString().slice(0, 10);
+  //    // Format startDate as YYYY-MM-DD
     
-    const endDate = new Date(); // Today's date
-    const formattedEndDate = endDate.toISOString().slice(0, 10); // Format endDate as YYYY-MM-DD
+  //   const endDate = new Date(); // Today's date
+  //   const formattedEndDate = endDate.toISOString().slice(0, 10); // Format endDate as YYYY-MM-DD
     
-    setDateRange([formattedStartDate, formattedEndDate]);
-  };
+  //   setDateRange([formattedStartDate, formattedEndDate]);
+  // };
 
   const [filterActive,setFilterActive] = useState(false)
 
@@ -238,7 +273,22 @@ setSelectedDate(null)
       .then(response => {
         setLoaderData(false)
         const { areas, ...datesData } = response.data;
-        setTableData(datesData);
+        setDatesData([datesData])
+
+        const extractedData = Object.entries(datesData).reduce((acc, [date, dateData]) => {
+          const filteredData = Object.entries(dateData)
+            .filter(([key]) => key !== 'total_duration')
+            .reduce((obj, [key, value]) => {
+              obj[key] = value;
+              return obj;
+            }, {});
+    
+          acc[date] = filteredData;
+          return acc;
+        }, {});
+    
+
+        setTableData(extractedData);
         setActiveProd(areas);
         setActiveProd(areas);
       })
@@ -248,7 +298,12 @@ setSelectedDate(null)
       });
   };
 
- 
+ useEffect(()=>{
+  const currentDate = getCurrentDate();
+  const currentData = datesData.flatMap(obj => obj[currentDate] || null).find(item => item);
+  setCurrentDateData(currentData)
+ },[datesData])
+
 
   // console.log(Object.keys(tableData).filter(res=>res !== "active_products"),"<<<tabledata")
 
@@ -360,6 +415,7 @@ const categorizeDefects = (data) => {
       console.error('Error fetching department data:', error);
     });
   };
+
   
   const menu = (
     <Menu selectable={true}>
@@ -523,8 +579,14 @@ const close = () => {
     'Notification was closed',
   );
 };
-console.log(menu,"<<<")
-  return (
+
+
+
+
+
+
+
+return (
     <>
     {contextHolder}
     {/* <Button type="primary" onClick={openNotification}>
@@ -630,9 +692,9 @@ console.log(menu,"<<<")
               className="mb-24"
             >
               <Card bordered={false} className="criclebox " style={{minHeight:"180px"}}>
-              <Dropdown overlay={defectMenu} trigger={['click']} >
+              {/* <Dropdown overlay={defectMenu} trigger={['click']} > */}
 
-                <div className="number" style={{cursor:"pointer"}}>
+                <div className="number" >
                   <Row align="middle">
                     <Col xs={18}>
                       <Title level={3} style={{fontSize:"1.5rem"}}>
@@ -640,7 +702,7 @@ console.log(menu,"<<<")
                       </Title>
 
                       {/* <span>  {Object.keys(categoryDefects).reduce((total, category) => total + category, 0)}</span> */}
-                      <span>  {Object.keys(categoryDefects).length}</span>
+                      <span>Today:   {currentDateData?.total_duration  ? <span className="bnb2" style={{color:"#52c41a",fontWeight:"650"}}>{parseFloat(currentDateData?.total_duration).toFixed(2)}</span> : "NO DATA"}</span>
 
 
                     </Col>
@@ -649,10 +711,10 @@ console.log(menu,"<<<")
                     </Col>
                   </Row>
                 </div>
-              </Dropdown>
+              {/* </Dropdown> */}
               </Card>
             </Col>
-            {/* <Col
+            <Col
               key={1}
               xs={24}
               sm={24}
@@ -666,22 +728,20 @@ console.log(menu,"<<<")
                   <Row align="middle">
                     <Col xs={18}>
                       <Title level={3} style={{fontSize:"1.5rem"}}>
-                        {`No. of SKU`}
+                        {`Areas`}
                       </Title>
-                      {
-                        alertData ? 
-                        <span>{Object.keys(activeProd).length }</span>
-                        : <span>0</span>
-                      }
+                      <span>{productOptions.length}</span>
                     </Col>
                     <Col xs={6}>
-                      <div className="icon-box"><AlertOutlined /></div>
+                      <div className="icon-box"><AlertOutlined />
+                      
+                      </div>
                     </Col>
                   </Row>
                 </div>
                 </Dropdown>
               </Card>
-            </Col> */}
+            </Col>
 
             <Col
               key={1}
@@ -749,7 +809,9 @@ console.log(menu,"<<<")
     <div className="timeline-box">
       <h5 style={{overflowWrap:'break-word'}}>{category}</h5>
       <Paragraph className="lastweek">
-        <span className="bnb2">{categoryDefects[category]}</span> seconds
+        <span className="bnb2">{
+          parseFloat(categoryDefects[category]).toFixed(2)
+          }</span> seconds
       </Paragraph>
     </div>
   </Card>
@@ -760,7 +822,7 @@ console.log(menu,"<<<")
     <h5>Total Time</h5>
     <Paragraph className="lastweek">
       <span className="bnb2">
-        {Object.values(categoryDefects).reduce((total, category) => total + category, 0)}
+        {Object.values(categoryDefects).reduce((total, category) => parseFloat(total + category).toFixed(2), 0)}
       </span> Seconds
     </Paragraph>
   </div>

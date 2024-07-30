@@ -43,7 +43,7 @@ function StackChart({ data }) {
   const seriesData = defectNames.map((defectName, index) => {
     return {
       name: defectName,
-      data: sortedDates.map(date => data[date][defectName] || 0),
+      data: sortedDates.map(date => parseFloat(data[date][defectName]).toFixed(2) || 0),
       color: defectColors[defectName] || ['#FF5733', '#e31f09', '#3357FF'][index % 3]
     };
   });

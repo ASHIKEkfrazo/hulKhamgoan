@@ -36,7 +36,8 @@ const Reports = () => {
     // { title: "Product Name", dataIndex: "product", key: "alert_name",id:"alert_name"  ,
     //   sorter: (a, b) => a.product.localeCompare(b.product),
     //   sortDirections: ['ascend','descend' ,'cancel'], },
-    { title: "Area Name", dataIndex: "defect", key: "defect_name" ,
+    
+    { title: "Area Name", dataIndex: "area", key: "area" ,
       sorter: (a, b) => a.defect.localeCompare(b.defect),
       sortDirections: ['ascend','descend' ,'cancel'],
 
@@ -48,8 +49,8 @@ const Reports = () => {
      },
     {
       title: "Downtime (seconds) ",
-      dataIndex: "department",
-      key: "department_name",
+      dataIndex: "downtime",
+      key: "downtime",
       sorter: (a, b) => a.department.localeCompare(b.department),
       sortDirections: ['ascend','descend' ,'cancel'],
     },
@@ -74,7 +75,7 @@ const Reports = () => {
           // <Image src={`http://localhost:8000${image_b64}`} alt="NA" width={50} />
           <p>NA</p>
           // <Image src={image_b64} alt="Defect Image" width={50} />
-        ) : null,
+        ) : "NA",
     },
   ];
   const locale = {
@@ -96,7 +97,7 @@ const Reports = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedDefect, setselectedDefect] = useState(defectId || null);
   const [selectedProduct, setselectedProduct] = useState(null);
-  const [dateRange, setDateRange] = useState([formattedStartDate, formattedEndDate]);
+  const [dateRange, setDateRange] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [pagination, setPagination] = useState({
@@ -151,8 +152,11 @@ const Reports = () => {
   const handleApplyFilters = (page,pageSize) => {
 
     const domain = `${baseURL}`;
-    console.log(page)
-    const [fromDate, toDate] = dateRange;
+    let fromDate, toDate;
+
+    if (Array.isArray(dateRange) && dateRange.length === 2) {
+      [fromDate, toDate] = dateRange;
+    }
      url = `${domain}reports/?page=${page}&page_size=${pageSize}&`;
     // url += `machine=${selectedMachine}&department=${selectedDepartment}`;
     // url += `?plant_id=${localPlantData.id}&from_date=${fromDate}&to_date=${toDate}&machine_id=${selectedMachine}&department_id=${selectedDepartment}&product_id=${selectedProduct}&defect_id=${selectedDefect}`;
@@ -171,15 +175,15 @@ const Reports = () => {
   if (selectedMachine) {
       url += `machine_id=${selectedMachine}&`;
   }
-  if (selectedDepartment) {
-      url += `department_id=${selectedDepartment}&`;
-  }
+  // if (selectedDepartment) {
+  //     url += `department_id=${selectedDepartment}&`;
+  // }
   if (selectedProduct) {
-      url += `product_id=${selectedProduct}&`;
+      url += `area=${selectedProduct}&`;
   }
-  if (selectedDefect) {
-      url += `defect_id=${selectedDefect}&`;
-  }
+  // if (selectedDefect) {
+  //     url += `defect_id=${selectedDefect}&`;
+  // }
   
   // Remove the trailing '&' if present
   if (url.endsWith('&')) {
@@ -281,16 +285,16 @@ const Reports = () => {
       });
   }
   
-  const initialDateRange = () => {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 7); // 7 days ago
-    const formattedStartDate = startDate.toISOString().slice(0, 10); // Format startDate as YYYY-MM-DD
+  // const initialDateRange = () => {
+  //   const startDate = new Date();
+  //   startDate.setDate(startDate.getDate() - 7); // 7 days ago
+  //   const formattedStartDate = startDate.toISOString().slice(0, 10); // Format startDate as YYYY-MM-DD
     
-    const endDate = new Date(); // Today's date
-    const formattedEndDate = endDate.toISOString().slice(0, 10); // Format endDate as YYYY-MM-DD
+  //   const endDate = new Date(); // Today's date
+  //   const formattedEndDate = endDate.toISOString().slice(0, 10); // Format endDate as YYYY-MM-DD
     
-    setDateRange([formattedStartDate, formattedEndDate]);
-  };
+  //   setDateRange([formattedStartDate, formattedEndDate]);
+  // };
 
   const initialTableData = (page,pageSize) => {
     // const domain = `http://143.110.184.45:8100/`;
@@ -321,7 +325,7 @@ const {results,total_count,page_size} = response.data
   };
   const prodApi = ()=>{
     const domain = `${baseURL}`;
-    const url = `${domain}product/?plant_name=${localPlantData.plant_name}`;
+    const url = `${domain}area/?plant_name=${localPlantData.plant_name}`;
     axios.get(url,{
       headers:{
         Authorization:`Bearer ${AuthToken}`
@@ -344,7 +348,7 @@ const {results,total_count,page_size} = response.data
       initialTableData(pagination.current, pagination.pageSize);
 
     }
-    initialDateRange()
+    // initialDateRange()
    prodApi()
   }, []); 
 
