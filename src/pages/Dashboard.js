@@ -48,6 +48,7 @@ function Dashboard() {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedDefect, setSelectedDefect] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedStoppage, setSelectedStoppage] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
 const [loaderData,setLoaderData] = useState(false)
   const [dateRange, setDateRange] = useState([]);
@@ -57,6 +58,8 @@ const [loaderData,setLoaderData] = useState(false)
 
   const [machineOptions, setMachineOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [stoppageOptions, setStoppageOptions] = useState(
+);
   const [productOptions, setProductOptions] = useState([]);
   const [activeMachines,setActiveMachines] = useState([])
   const [activeProd,setActiveProd] = useState([])
@@ -70,6 +73,9 @@ const [loaderData,setLoaderData] = useState(false)
   };
   const handleProductChange = value => {
     setSelectedProduct(value);
+  };
+  const handleStoppageChange = value => {
+    setSelectedStoppage(value);
   };
 
   const handleChange =  value =>{
@@ -98,6 +104,7 @@ initialProductionData()
 setSelectedMachine(null)
 setSelectedProduct(null)
 setSelectedDate(null)
+setSelectedStoppage(null)
   }
   
   const handleApplyFilters = () => {
@@ -128,9 +135,9 @@ setSelectedDate(null)
   if (selectedProduct) {
       url += `area=${selectedProduct}&`;
   }
-  // if (selectedDefect) {
-  //     url += `defect_id=${selectedDefect}&`;
-  // }
+  if (selectedStoppage) {
+      url += `type_of_stoppage=${selectedStoppage}&`;
+  }
   
   // Remove the trailing '&' if present
   if (url.endsWith('&')) {
@@ -196,6 +203,7 @@ setSelectedDate(null)
     getDepartments();
     getMachines();
     // initialDateRange();
+    getStoppage()
     initialTableData();
     initialProductionData()
     alertApi()
@@ -242,6 +250,24 @@ setSelectedDate(null)
         console.error('Error fetching department data:', error);
       });
   };
+
+
+  const getStoppage=()=>{
+    let url = `${baseURL}stoppage/`;
+    axios.get(url,{
+      headers:{
+        Authorization:`Bearer ${AuthToken}`
+      }
+    })
+      .then(response => {
+    
+        setStoppageOptions(response.results);
+      })
+      .catch(error => {
+        console.error('Error fetching machine data:', error);
+      });
+  }
+
   // const initialDateRange = () => {
   //   const startDate = new Date();
   //   startDate.setDate(startDate.getDate() - 7); // 7 days ago
@@ -613,7 +639,7 @@ return (
   }
   size="large"
 >
-  {machineOptions.map(machine => (
+  {machineOptions?.map(machine => (
     <Select.Option key={machine.id} value={machine.id}>{machine.name}</Select.Option>
   ))}
 </Select>
@@ -630,10 +656,31 @@ return (
         }
      
       >
-        {productOptions.map(department => (
+        {productOptions?.map(department => (
           <Select.Option key={department.id} value={department.id}>{department.name}</Select.Option>
         ))}
       </Select>
+
+
+      <Select
+        style={{ minWidth: "200px", marginRight: "10px" }}
+        showSearch
+        placeholder="Select Stoppage"
+        onChange={handleStoppageChange}
+        value={selectedStoppage}
+        size="large"
+        filterOption={(input, stoppageOptions) =>
+          (stoppageOptions?.children ?? '').toLowerCase().includes(input.toLowerCase())
+        }
+     
+      >
+        {stoppageOptions?.map(department => (
+          <Select.Option key={department.id} value={department.id}>{department.name}</Select.Option>
+        ))}
+      </Select>
+
+
+
 
       <RangePicker
       // showTime
@@ -730,7 +777,7 @@ return (
                       <Title level={3} style={{fontSize:"1.5rem"}}>
                         {`Areas`}
                       </Title>
-                      <span>{productOptions.length}</span>
+                      <span>{productOptions?.length}</span>
                     </Col>
                     <Col xs={6}>
                       <div className="icon-box"><AlertOutlined />
@@ -861,13 +908,21 @@ return (
           </Col> */}
            <Col xs={24} sm={24} md={24} lg={24} xl={12} className="mb-24">
             <Card bordered={false} className="criclebox h-full">
-              <StackChart data={tableData}/>
+            {
+              tableData ? 
+              <StackChart data={tableData}/> 
+              :null
+            }
 
             </Card>
           </Col> 
           <Col xs={24} sm={24} md={12} lg={12} xl={12} className="mb-24">
             <Card bordered={false} className="criclebox h-full">
-              <PieChart data={tableData} selectedDate={selectedDate} />
+              {
+                  tableData ? 
+                  <PieChart data={tableData} selectedDate={selectedDate} />
+                  :null
+              }
             </Card>
           </Col>
 </>

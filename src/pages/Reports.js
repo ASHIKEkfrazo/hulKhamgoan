@@ -61,11 +61,11 @@ const Reports = () => {
       render: (text) => <a>{(text).split("T").join(" , ")}</a>,
 
     },
-    // { title: "Plant Name", dataIndex: "plant", key: "plant" ,
-    //   sorter: (a, b) => a.plant.localeCompare(b.plant),
-    //   sortDirections: ['ascend','descend' ,'cancel'],
+    { title: "Stoppage Type", dataIndex: "type_of_stoppage", key: "type_of_stoppage" ,
+      // sorter: (a, b) => a.plant.localeCompare(b.plant),
+      // sortDirections: ['ascend','descend' ,'cancel'],
 
-    // },
+    },
     {
       title: "Image",
       dataIndex: "image",
@@ -97,6 +97,9 @@ const Reports = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedDefect, setselectedDefect] = useState(defectId || null);
   const [selectedProduct, setselectedProduct] = useState(null);
+  const [selectedStoppage, setSelectedStoppage] = useState(null);
+  const [stoppageOptions, setStoppageOptions] = useState(
+);
   const [dateRange, setDateRange] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -132,7 +135,13 @@ const Reports = () => {
       current: 1,
     })
   };
-
+  const handleStoppageChange = value => {
+    setSelectedStoppage(value);
+    setPagination({
+      ...pagination,
+      current: 1,
+    })
+  };
   const handleDepartmentChange = value => {
     setSelectedDepartment(value);
   };
@@ -181,9 +190,9 @@ const Reports = () => {
   if (selectedProduct) {
       url += `area=${selectedProduct}&`;
   }
-  // if (selectedDefect) {
-  //     url += `defect_id=${selectedDefect}&`;
-  // }
+  if (selectedStoppage) {
+    url += `type_of_stoppage=${selectedStoppage}&`;
+}
   
   // Remove the trailing '&' if present
   if (url.endsWith('&')) {
@@ -264,7 +273,23 @@ const Reports = () => {
       });
   }
 
-  const [departmentOptions, setDepartmentOptions] = useState([]);
+  const getStoppage=()=>{
+    let url = `${baseURL}stoppage/`;
+    axios.get(url,{
+      headers:{
+        Authorization:`Bearer ${AuthToken}`
+      }
+    })
+      .then(response => {
+    
+        setStoppageOptions(response.results);
+      })
+      .catch(error => {
+        console.error('Error fetching machine data:', error);
+      });
+  }
+
+    const [departmentOptions, setDepartmentOptions] = useState([]);
   const getDepartments=()=>{
     const domain = `${baseURL}`;
     let url = `${domain}department/?plant_name=${localPlantData.plant_name}`;
@@ -342,6 +367,7 @@ const {results,total_count,page_size} = response.data
     getDepartments()
     getMachines();
     getDefects()
+    getStoppage()
     if(defectProp){
       handleApplyFilters(pagination.current, pagination.pageSize)
     }else{
@@ -468,6 +494,7 @@ const resetFilter = ()=>{
   setselectedDefect(null)
   setSelectedMachine(null)
   setselectedProduct(null)
+  setSelectedStoppage(null)
   setSelectedDate(null)
   setPagination({
     ...pagination,
@@ -510,11 +537,27 @@ const resetFilter = ()=>{
         size="large"
         filterOption={(input,productOptions)=>
         // ( productOptions.children ?? "".toLowerCase() ).includes(input.toLowerCase() )
-       ( productOptions.children ?? "").toLowerCase().includes(input.toLowerCase())
+       ( productOptions?.children ?? "").toLowerCase().includes(input.toLowerCase())
 
         }
       >
-        {productOptions.map(department => (
+        {productOptions?.map(department => (
+          <Select.Option key={department.id} value={department.id}>{department.name}</Select.Option>
+        ))}
+      </Select>
+      <Select
+        style={{ minWidth: "200px", marginRight: "10px" }}
+        showSearch
+        placeholder="Select Stoppage"
+        onChange={handleStoppageChange}
+        value={selectedStoppage}
+        size="large"
+        filterOption={(input, stoppageOptions) =>
+          (stoppageOptions?.children ?? '').toLowerCase().includes(input.toLowerCase())
+        }
+     
+      >
+        {stoppageOptions?.map(department => (
           <Select.Option key={department.id} value={department.id}>{department.name}</Select.Option>
         ))}
       </Select>
