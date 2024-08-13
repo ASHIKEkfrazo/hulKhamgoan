@@ -1,6 +1,6 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import { ToastContainer,toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Main from "./components/layout/Main";
@@ -17,7 +17,7 @@ import Plant from "./pages/Plant.js";
 import {
   createBrowserRouter,
   createRoutesFromElements,
-  
+
   RouterProvider,
 } from "react-router-dom";
 import Organisation from "./pages/Organization.js";
@@ -36,7 +36,7 @@ import { baseURL } from "./API/API.js";
 
 const App = () => {
 
-  const [refreshTokens, setrefreshTokens] = useState(() => 
+  const [refreshTokens, setrefreshTokens] = useState(() =>
     JSON.parse(localStorage.getItem('refreshToken')) || null
   );
   const refreshToken = async () => {
@@ -45,8 +45,8 @@ const App = () => {
         refresh: refreshTokens,
       });
       console.log(response)
- 
-      localStorage.setItem("token",JSON.stringify(response.data.access))
+
+      localStorage.setItem("token", JSON.stringify(response.data.access))
 
     } catch (error) {
       console.error('Token refresh failed:', error);
@@ -54,9 +54,9 @@ const App = () => {
   };
 
 
-   setInterval(() => {
-        refreshToken();
-    }, 15 * 60 * 1000); // Refresh every 15 minutes
+  setInterval(() => {
+    refreshToken();
+  }, 15 * 60 * 1000); // Refresh every 15 minutes
 
 
 
@@ -64,14 +64,14 @@ const App = () => {
     {
       path: "/",
       element: <Layout />,
-   
+
       children: [
         {
-          path: "", 
+          path: "",
           element: <Dashboard />,
         },
         {
-         path: 'dashboard-home',
+          path: 'dashboard-home',
           element: <Dashboard />,
         },
         {
@@ -93,15 +93,15 @@ const App = () => {
         {
           path: 'settings',
           element: <Settings />,
-        }, 
-          {
+        },
+        {
           path: 'insights',
           element: <Insights />,
         },
         // {
         //   path: 'Plants',
         //   element: <Organisation />,
-     
+
         // },
         // {
         //   path: 'Plants/:id',
@@ -116,22 +116,19 @@ const App = () => {
     {
       path: "/login",
       element: <Login />,
-    }, 
-      {
+    },
+    {
       path: "/resetPassword",
       element: <ResetPassword />,
     },
-    {
-      path: "/Plant",
-      element: <Plant />,
-    },
+
 
   ]);
   // const { notifications, isSocketConnected } = useWebSocket();
 
   return (
     <>
-         <RouterProvider router={router} />
+      <RouterProvider router={router} />
     </>
     // <div className="App" >
     //   <Switch>
