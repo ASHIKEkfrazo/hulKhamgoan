@@ -6,6 +6,39 @@ const ApexChart = ({ data }) => {
     const [categories, setCategories] = useState([]);
 
 
+    // const data = [
+    //     {
+    //         "2024-08-08": {
+    //             "shift1": {
+    //                 "major": 0,
+    //                 "minor": 0
+    //             },
+    //             "shift2": {
+    //                 "major": 0,
+    //                 "minor": 0
+    //             },
+    //             "shift3": {
+    //                 "major": 10,
+    //                 "minor": 40
+    //             }
+    //         },
+    //         "2024-08-09": {
+    //             "shift1": {
+    //                 "major": 20.1,
+    //                 "minor": 40.2
+    //             },
+    //             "shift2": {
+    //                 "major": 30.1,
+    //                 "minor": 60.300000000000004
+    //             },
+    //             "shift3": {
+    //                 "major": 0,
+    //                 "minor": 20.1
+    //             }
+    //         }
+    //     }
+    // ]
+
 
     useEffect(() => {
         if (data && data.length > 0) {
@@ -49,7 +82,7 @@ const ApexChart = ({ data }) => {
             };
 
             // Transform the input data array and update state
-            const transformedData = transformData([data]);
+            const transformedData = transformData(data);
             setChartData(transformedData);
 
             // Set the categories based on dates in the data
@@ -77,7 +110,7 @@ const ApexChart = ({ data }) => {
             }
         },
         xaxis: {
-            categories: categories
+            categories: Object.keys(data[0])
         },
         fill: {
             opacity: 1

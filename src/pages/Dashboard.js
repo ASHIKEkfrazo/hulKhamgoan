@@ -69,36 +69,7 @@ function Dashboard() {
   const [shiftData, setShiftData] = useState(
 
 
-    {
-      "2024-08-08": {
-        "shift1": {
-          "major": 0,
-          "minor": 0
-        },
-        "shift2": {
-          "major": 0,
-          "minor": 0
-        },
-        "shift3": {
-          "major": 10,
-          "minor": 40
-        }
-      },
-      "2024-08-09": {
-        "shift1": {
-          "major": 20.1,
-          "minor": 40.2
-        },
-        "shift2": {
-          "major": 30.1,
-          "minor": 60.300000000000004
-        },
-        "shift3": {
-          "major": 0,
-          "minor": 20.1
-        }
-      }
-    }
+
   )
 
   const handleMachineChange = value => {
@@ -276,7 +247,7 @@ function Dashboard() {
       }
     })
       .then(response => {
-        // setShiftData(response.data)
+        setShiftData([response.data])
       })
       .catch(error => {
         console.error('Error fetching Shift data data:', error);
