@@ -20,11 +20,11 @@ import {
 
   RouterProvider,
 } from "react-router-dom";
-import Organisation from "./pages/Organization.js";
 import Plants from "./pages/Plants.js";
 import Select_dashboard from "./pages/SelectDashboard.js";
 import "react-toastify/dist/ReactToastify.css";
 import Insights from "./pages/Insights.js";
+import Organisation from "./pages/Plant.js";
 
 import 'react-toastify/dist/ReactToastify.css';
 // import useWebSocket from './WebSocketService';
@@ -98,11 +98,7 @@ const App = () => {
           path: 'insights',
           element: <Insights />,
         },
-        // {
-        //   path: 'Plants',
-        //   element: <Organisation />,
 
-        // },
         // {
         //   path: 'Plants/:id',
         //   element: <Plants />,
@@ -112,6 +108,11 @@ const App = () => {
         //   element: <Selectdashboard />,
         // },
       ]
+    },
+    {
+      path: 'Plant',
+      element: <Organisation />,
+
     },
     {
       path: "/login",

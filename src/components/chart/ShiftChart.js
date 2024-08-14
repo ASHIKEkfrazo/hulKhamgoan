@@ -5,6 +5,8 @@ const ApexChart = ({ data }) => {
     const [chartData, setChartData] = useState([]);
     const [categories, setCategories] = useState([]);
 
+
+
     useEffect(() => {
         if (data && data.length > 0) {
             const transformData = (dataArray) => {
@@ -34,12 +36,12 @@ const ApexChart = ({ data }) => {
                     result.push({
                         name: `${shift} Major`,
                         group: shift,
-                        data: shiftData[shift].major.map(val => parseFloat(val).toFixed(1))
+                        data: shiftData[shift].major
                     });
                     result.push({
                         name: `${shift} Minor`,
                         group: shift,
-                        data: shiftData[shift].minor.map((val) => parseFloat(val).toFixed(1))
+                        data: shiftData[shift].minor
                     });
                 });
 
@@ -47,7 +49,7 @@ const ApexChart = ({ data }) => {
             };
 
             // Transform the input data array and update state
-            const transformedData = transformData(data);
+            const transformedData = transformData([data]);
             setChartData(transformedData);
 
             // Set the categories based on dates in the data
@@ -80,7 +82,8 @@ const ApexChart = ({ data }) => {
         fill: {
             opacity: 1
         },
-        colors: ['#FF5733', '#FF8D1A'], // Add your desired colors here     
+        // Assign different colors for each shift
+        colors: ['#FF5733', '#FF8D1A', '#33FF57', '#75FF33', '#3357FF', '#33A1FF'], // Add your desired colors here
         yaxis: {
             labels: {
 
@@ -92,19 +95,11 @@ const ApexChart = ({ data }) => {
         }
     });
 
-
     return (
-
         <div>
-            {
-                data.length > 0 ?
-                    <div id="chart">
-
-                        <ReactApexChart options={options} series={chartData} type="bar" height={350} />
-                    </div>
-                    :
-                    <div className="" style={{ textAlign: 'center', alignContent: 'center', fontWeight: 700 }}>NO DATA</div>
-            }
+            <div id="chart">
+                <ReactApexChart options={options} series={chartData} type="bar" height={350} />
+            </div>
         </div>
     );
 };
