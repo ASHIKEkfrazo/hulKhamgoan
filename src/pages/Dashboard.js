@@ -67,7 +67,11 @@ function Dashboard() {
   const [activeMachines, setActiveMachines] = useState([])
   const [activeProd, setActiveProd] = useState([])
   const [currentDateData, setCurrentDateData] = useState();
-  const [shiftData, setShiftData] = useState([])
+  const [shiftData, setShiftData] = useState(
+
+
+
+  )
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -300,14 +304,14 @@ function Dashboard() {
   };
   const getShiftData = () => {
     const domain = `${baseURL}`;
-    let url = `${domain}/api/stoppage-graph/`;
+    let url = `${domain}/stoppage-graph/`;
     axios.get(url, {
       headers: {
         'Authorization': `Bearer ${AuthToken}`
       }
     })
       .then(response => {
-        setShiftData(response.data)
+        setShiftData([response.data])
       })
       .catch(error => {
         console.error('Error fetching Shift data data:', error);

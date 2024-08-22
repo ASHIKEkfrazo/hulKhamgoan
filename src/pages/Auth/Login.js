@@ -56,7 +56,6 @@ const Login = () => {
           setTimeout(() => {
             navigate("/Plant");
             window.location.reload()
-
           }, 1500)
         }
 
