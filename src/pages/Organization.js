@@ -1,6 +1,6 @@
 import { Row, Col, Button, Card, Space, Modal } from "antd";
 import React, { useEffect, useState } from "react";
-import { Link ,useLocation, useNavigation} from "react-router-dom";
+import { Link, useLocation, useNavigation } from "react-router-dom";
 import { baseURL } from "../API/API";
 import axios from "axios";
 import { Switch } from "antd";
@@ -20,7 +20,7 @@ const Organisation = () => {
     organization_logo: "",
   });
 
-const navigate  = useNavigation()
+  const navigate = useNavigation()
 
   const handleImageUpload = async (e) => {
     setError((err) => ({ ...err, imageError: "" }));
@@ -39,11 +39,11 @@ const navigate  = useNavigation()
     reader.readAsDataURL(file);
   };
 
-const location = useLocation();
+  const location = useLocation();
 
-useEffect(()=>{
-  localStorage.setItem("componentPath",location.pathname)
-},[])
+  useEffect(() => {
+    localStorage.setItem("componentPath", location.pathname)
+  }, [])
 
   useEffect(() => {
     axios
@@ -52,9 +52,9 @@ useEffect(()=>{
         {
 
           headers: {
-     Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5MjA1NjMzLCJpYXQiOjE3MTg3NzM2MzMsImp0aSI6IjI1NTQ2ZTQ1OWM2MDRhOWRiMTNjM2IwNDFjNjZlZjRjIiwidXNlcl9pZCI6Mn0.68CBeuBUsQRYWDD0FVLoekKWRy_iO_g8sBoGLXrj0J0`,
-   } 
-   }
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5MjA1NjMzLCJpYXQiOjE3MTg3NzM2MzMsImp0aSI6IjI1NTQ2ZTQ1OWM2MDRhOWRiMTNjM2IwNDFjNjZlZjRjIiwidXNlcl9pZCI6Mn0.68CBeuBUsQRYWDD0FVLoekKWRy_iO_g8sBoGLXrj0J0`,
+          }
+        }
       )
 
       .then((res) => {
@@ -69,12 +69,12 @@ useEffect(()=>{
   const createOrganization = async () => {
     try {
       const res = await axios.post(`${baseURL}organization/`, formData, {
-      
+
       });
-      if(res.status == 201){
+      if (res.status == 201) {
         setModal2Open(false);
-          window.location.reload()
-           }
+        window.location.reload()
+      }
     } catch (error) {
       console.log(error);
     }
@@ -95,34 +95,34 @@ useEffect(()=>{
 
   const handlepost = () => {
 
-  if(formData.organization_name === ""){
-  setError((prev)=>({...prev,nameError:"Please Enter Organization namre"}))
-  }else{
-    setError((prev)=>({...prev,nameError:""}))
+    if (formData.organization_name === "") {
+      setError((prev) => ({ ...prev, nameError: "Please Enter Organization namre" }))
+    } else {
+      setError((prev) => ({ ...prev, nameError: "" }))
 
-  }
-  if(formData.organization_logo === ""){
-    setError((prev)=>({...prev,imageError:"Please Enter Organization namre"}))
-  }
-  else{
-    setError((prev)=>({...prev,imageError:""}))
+    }
+    if (formData.organization_logo === "") {
+      setError((prev) => ({ ...prev, imageError: "Please Enter Organization namre" }))
+    }
+    else {
+      setError((prev) => ({ ...prev, imageError: "" }))
 
-  }
-console.log(formData)
-console.log(error)
-if(error.imageError !== "" || error.nameError !== "" || formData.organization_name === "" || formData.organization_logo === ""){
-   return
-  }
-else{
-   createOrganization();
-}
+    }
+    console.log(formData)
+    console.log(error)
+    if (error.imageError !== "" || error.nameError !== "" || formData.organization_name === "" || formData.organization_logo === "") {
+      return
+    }
+    else {
+      createOrganization();
+    }
 
   };
- 
-  const handleStorage =(id)=>{
-    const organizationAndplant = {"pID":null,"oID":id}
+
+  const handleStorage = (id) => {
+    const organizationAndplant = { "pID": null, "oID": id }
     localStorage.setItem("dataOrgPlant", JSON.stringify(organizationAndplant));
-   
+
   }
 
   return (
@@ -133,7 +133,7 @@ else{
             type="primary"
             style={{ width: "100%", padding: "0" }}
             danger
-            onClick={() =>  { return( setModal2Open(true),navigate("/organization") )}}
+            onClick={() => { return (setModal2Open(true), navigate("/organization")) }}
           >
             Create Organization
           </Button>{" "}
@@ -151,7 +151,7 @@ else{
       >
         {organization?.map((item, index) => {
           return (
-            <Link to={`/Plants/${item.id}`} key={item.id} onClick={()=>handleStorage(item.id)}>
+            <Link to={`/Plants/${item.id}`} key={item.id} onClick={() => handleStorage(item.id)}>
               <Card
                 size="small"
                 style={{

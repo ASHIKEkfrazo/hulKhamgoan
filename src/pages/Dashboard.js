@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import { Hourglass } from "react-loader-spinner";
 import ShiftChart from "../components/chart/ShiftChart";
 import ApexChart from "../components/chart/ShiftChart";
+import TableComponent from "../components/TableComponent/Table";
 
 function Dashboard() {
 
@@ -68,6 +69,18 @@ function Dashboard() {
   const [currentDateData, setCurrentDateData] = useState();
   const [shiftData, setShiftData] = useState([])
 
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 0,
+    position: ['topRight'],
+    showSizeChanger: true
+  });
+
+
+  const [downTimeData, setDownTimeData] = useState([]);
+
   const handleMachineChange = value => {
     setSelectedMachine(value);
   };
@@ -81,11 +94,7 @@ function Dashboard() {
     setSelectedStoppage(value);
   };
 
-  const handleChange = value => {
 
-  }
-
-  const navigate = useNavigate()
 
   const localItems = localStorage.getItem("PlantData")
   const localPlantData = JSON.parse(localItems)
@@ -108,6 +117,11 @@ function Dashboard() {
     setSelectedProduct(null)
     setSelectedDate(null)
     setSelectedStoppage(null)
+  }
+
+  const resetTableData = () => {
+    setFilterActiveTable(false)
+    downtimeAnalysisData()
   }
 
   const handleApplyFilters = () => {
@@ -185,6 +199,55 @@ function Dashboard() {
       });
   };
 
+
+  const handleApplyFiltersTable = () => {
+    const params = {
+      page: 1,
+      page_size: 10,
+      from_date: dateRange?.[0] || undefined,
+      to_date: dateRange?.[1] || undefined,
+      areas: selectedProduct || undefined,
+
+    };
+
+    const filteredQueryParams = Object.fromEntries(
+      Object.entries(params).filter(
+        ([_, value]) => value !== undefined && value !== null
+      )
+    );
+    const queryString = new URLSearchParams(filteredQueryParams).toString();
+    const url = `${queryString}`;
+    axios.get(`${baseURL}downtime-analysis/?${url}`)
+      .then((res) => {
+        const { results, page_size, total_count, total_pages } = res.data
+
+        setDownTimeData(results)
+        setPagination((prev) => ({
+          ...prev,
+          pageSize: page_size,
+          total: total_count,
+          totalPages: total_pages
+        }))
+        setFilterActiveTable(true)
+      })
+      .catch(err => console.log(err))
+  }
+
+
+  const handleTableChange = (pagination) => {
+    setPagination({
+      ...pagination,
+      pageSize: pagination.pageSize
+    })
+    if (filterActiveTable) {
+      handleApplyFiltersTable(pagination.current, pagination.pageSize)
+    }
+    else {
+      downtimeAnalysisData(pagination.current, pagination.pageSize);
+    }
+
+  };
+
   const getSystemStatus = () => {
     const domain = `${baseURL}`;
     let url = `${domain}system-status/?plant_id=${localPlantData.id}`;
@@ -212,6 +275,7 @@ function Dashboard() {
     initialProductionData()
     alertApi()
     getSystemStatus()
+    downtimeAnalysisData()
   }, []);
 
   const getMachines = () => {
@@ -300,6 +364,7 @@ function Dashboard() {
   // };
 
   const [filterActive, setFilterActive] = useState(false)
+  const [filterActiveTable, setFilterActiveTable] = useState(false)
 
   const initialTableData = () => {
 
@@ -342,6 +407,31 @@ function Dashboard() {
         setLoaderData(false)
       });
   };
+
+
+  const downtimeAnalysisData = () => {
+    const url = `${baseURL}downtime-analysis/`
+    axios.get(url, {
+      headers: {
+        Authorization: ` Bearer ${AuthToken}`
+      }
+    })
+      .then(response => {
+        const { results, page_size, total_count, total_pages } = response.data
+        setDownTimeData(results)
+        setPagination((prev) => ({
+          ...prev,
+          pageSize: page_size,
+          total: total_count,
+          totalPages: total_pages
+        }))
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+
+
 
   useEffect(() => {
     const currentDate = getCurrentDate();
@@ -949,11 +1039,76 @@ function Dashboard() {
                     }
                   </Card>
                 </Col>
+
               </>
           }
 
         </Row>
+        <Col xs={24} sm={24} md={24} lg={24} xl={24} className="mb-24">
 
+          <Card bordered={false} className="criclebox h-full">
+            <Row className="rowgap-vbox" gutter={[24, 0]}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={6}
+                className="mb-24"
+                style={{ display: "flex", gap: "1rem" }}
+              >
+                {/* <Select
+                  style={{ minWidth: "200px", marginRight: "10px" }}
+                  showSearch
+                  placeholder="Select Gate"
+                  value={selectedMachine}
+                  onChange={handleMachineChange}
+                  filterOption={(input, machineOptions) =>
+                    (machineOptions?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+                  size="large"
+                >
+                  {machineOptions?.map(machine => (
+                    <Select.Option key={machine.id} value={machine.id}>{machine.name}</Select.Option>
+                  ))}
+                </Select> */}
+
+                <Select
+                  style={{ minWidth: "200px", marginRight: "10px" }}
+                  showSearch
+                  placeholder="Select Area"
+                  onChange={handleProductChange}
+                  value={selectedProduct}
+                  size="large"
+                  filterOption={(input, productOptions) =>
+                    (productOptions?.children ?? '').toLowerCase().includes(input.toLowerCase())
+                  }
+
+                >
+                  {productOptions?.map(department => (
+                    <Select.Option key={department.id} value={department.id}>{department.name}</Select.Option>
+                  ))}
+                </Select>
+                <RangePicker
+                  // showTime
+                  size="large"
+                  style={{ marginRight: "10px", minWidth: "280px" }}
+                  onChange={handleDateRangeChange}
+                  allowClear={false}
+                  inputReadOnly={true}
+                  value={selectedDate ? [dayjs(selectedDate[0], dateFormat), dayjs(selectedDate[1], dateFormat)] : []}
+                />
+
+                <Button type="primary" onClick={handleApplyFiltersTable} style={{ fontSize: "1rem", backgroundColor: "#ec522d", marginRight: "10px" }}>Apply filters</Button>
+                {filterActiveTable ?
+                  <Button type="primary" onClick={resetTableData} style={{ fontSize: "1rem", backgroundColor: "#ec522d", marginRight: "10px" }}>Reset Filter</Button>
+                  : null}
+
+
+              </Col>
+            </Row>
+            <TableComponent data={downTimeData} pagination={pagination} action={() => handleTableChange()} />
+          </Card>
+        </Col>
       </div>
     </>
   );

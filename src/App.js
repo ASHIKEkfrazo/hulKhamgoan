@@ -98,11 +98,7 @@ const App = () => {
           path: 'insights',
           element: <Insights />,
         },
-        // {
-        //   path: 'Plants',
-        //   element: <Organisation />,
 
-        // },
         // {
         //   path: 'Plants/:id',
         //   element: <Plants />,
@@ -112,6 +108,11 @@ const App = () => {
         //   element: <Selectdashboard />,
         // },
       ]
+    },
+    {
+      path: 'Plant',
+      element: <Plant />,
+
     },
     {
       path: "/login",

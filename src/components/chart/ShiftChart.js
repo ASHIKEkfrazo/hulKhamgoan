@@ -8,12 +8,16 @@ const ApexChart = ({ data }) => {
     useEffect(() => {
         if (data && data.length > 0) {
             const transformData = (dataArray) => {
+                if (!Array.isArray(dataArray)) {
+                    return []
+                }
                 const result = [];
                 const shiftNames = Object.keys(dataArray[0][Object.keys(dataArray[0])[0]]);
                 const shiftData = {};
 
                 // Process each object in the input array
-                dataArray.forEach(data => {
+
+                dataArray?.forEach(data => {
                     Object.keys(data).forEach(date => {
                         shiftNames.forEach(shift => {
                             if (!shiftData[shift]) {

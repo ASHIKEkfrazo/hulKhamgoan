@@ -4,27 +4,27 @@ import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import Login from "./Auth/Login";
 import Main from "../components/layout/Main";
 export default function Layout() {
-const [auth,setAuth] = useState(false)
+  const [auth, setAuth] = useState(false)
 
-const token = localStorage.getItem("token");
-const PlantData = localStorage.getItem("PlantData");
+  const token = localStorage.getItem("token");
+  const PlantData = localStorage.getItem("PlantData");
 
-useLayoutEffect(()=>{
-    if(token && PlantData){
-        setAuth(true)
+  useLayoutEffect(() => {
+    if (token && PlantData) {
+      setAuth(true)
     }
-    else{
-        setAuth(false)
+    else {
+      setAuth(false)
     }
-},[])
+  }, [])
 
   return (
     <>
-    
-  {
-    auth ? <Main><Outlet/> </Main> : <Login/>
-  }
-   
+
+      {
+        auth ? <Main><Outlet /> </Main> : <Login />
+      }
+
     </>
   )
 }
