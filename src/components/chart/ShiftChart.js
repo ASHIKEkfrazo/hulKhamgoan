@@ -56,6 +56,8 @@ const ApexChart = ({ data }) => {
 
             // Set the categories based on dates in the data
             setCategories(Object.keys(data[0]));
+            // setCategories(Object.keys(data[0]));
+            // setCategories(Object.keys(data[0]));
         }
 
     }, [data]);
